@@ -1,0 +1,65 @@
+classDiagram
+    direction TB
+
+    class Task {
+        +str description
+        +str|None due_time
+        +int duration_minutes
+        +str priority
+        +str task_type
+        +bool recurring
+        +bool completed
+        +dict PRIORITY_ORDER$
+        +dict TASK_EMOJIS$
+        +dict PRIORITY_EMOJI$
+        +mark_complete() None
+        +priority_value() int
+        +end_time() str|None
+        +end_minutes() int|None
+        +start_minutes() int|None
+        +overlaps_with(other: Task) bool
+        +to_dict() dict
+        +_to_minutes(time_str: str)$ int
+        +_from_minutes(total: int)$ str
+    }
+
+    class Pet {
+        +str name
+        +str species
+        +int age
+        +List~Task~ tasks
+        +add_task(task: Task) None
+        +remove_task(description: str) bool
+        +list_tasks() List~Task~
+        +get_pending_tasks() List~Task~
+        +get_completed_tasks() List~Task~
+    }
+
+    class Owner {
+        +str name
+        +str email
+        +List~Pet~ pets
+        +add_pet(pet: Pet) None
+        +get_pet_by_name(name: str) Pet|None
+        +list_pets() List~Pet~
+        +get_all_tasks() List~Tuple~
+        +get_all_pending_tasks() List~Tuple~
+    }
+
+    class Scheduler {
+        +Owner owner
+        +sort_tasks_by_priority(pet, pending_only) List~Tuple~
+        +sort_tasks_by_due_time(pet, pending_only) List~Tuple~
+        +filter_tasks(status, task_type, pet) List~Tuple~
+        +detect_conflicts(pet) List~Tuple~
+        +next_available_slot(duration, start_after, end_before, pet) str|None
+        +generate_daily_schedule(start_time, end_time) List~Tuple~
+        -_all_pending(pet) List~Tuple~
+        -_all_tasks(pet) List~Tuple~
+    }
+
+    Owner "1" --> "1..*" Pet : owns
+    Pet  "1" --> "0..*" Task : has
+    Scheduler "1" --> "1" Owner : manages
+    Scheduler ..> Pet  : queries
+    Scheduler ..> Task : sorts / filters / schedules
